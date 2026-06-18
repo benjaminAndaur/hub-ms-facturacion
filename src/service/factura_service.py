@@ -18,6 +18,13 @@ class FacturaService:
     def __init__(self, repository: FacturaRepository):
         self.repository = repository
 
+    async def check_db_health(self) -> bool:
+        try:
+            await self.repository.check_db_health()
+            return True
+        except Exception:
+            return False
+
     async def crear_factura(self, data: dict) -> FacturaResponseDTO:
         dto = FacturaDTO(**data)
         nueva = FacturaDB(**dto.model_dump())

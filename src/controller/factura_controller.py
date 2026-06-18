@@ -6,7 +6,13 @@ def create_factura_blueprint():
 
     @bp.route('/health', methods=['GET'])
     async def health():
-        return jsonify({"status": "ok", "service": "facturacion"}), 200
+        db_ok = await g.current_service.check_db_health()
+        return jsonify({
+            "status": "ok",
+            "service": "facturacion",
+            "db": "facturacion_db",
+            "db_status": "connected" if db_ok else "error"
+        }), 200
 
     @bp.route('/facturas', methods=['POST'])
     @login_required
