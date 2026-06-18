@@ -1,6 +1,8 @@
-# modulo_facturacion
+# hub-ms-facturacion
 
 Microservicio de Facturación del Hub Empresarial. Expone una API REST (Quart, async) para crear, listar, actualizar y eliminar facturas.
+
+Repos relacionados: [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) (nginx, docker-compose, base de datos), [`hub-backends`](https://github.com/benjaminAndaur/hub-backends) (resto de microservicios), [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion) (microservicio hermano con BD propia), [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends).
 
 ## Persistencia de datos — Database per Service
 
@@ -8,7 +10,7 @@ A diferencia del resto de los módulos del Hub (que comparten la base de datos `
 
 - Motor: PostgreSQL 15.
 - Acceso: exclusivamente vía SQLAlchemy 2.0 async + asyncpg, desde la capa `src/repository`.
-- Schema inicial: [`hub-infra/db_facturacion/init.sql`](../../hub-infra/db_facturacion/init.sql) (tabla `facturas` y datos semilla). El ORM además ejecuta `Base.metadata.create_all()` al arrancar como red de seguridad.
+- Schema inicial: [`hub-infra/db_facturacion/init.sql`](https://github.com/benjaminAndaur/hub-infra/blob/main/db_facturacion/init.sql) (tabla `facturas` y datos semilla). El ORM además ejecuta `Base.metadata.create_all()` al arrancar como red de seguridad.
 - Variable de entorno: `DATABASE_URL=postgresql+asyncpg://admin:admin123@db-facturacion:5432/facturacion_db`.
 - Sin FK hacia otros módulos: el campo `cliente` se guarda como texto, sin referencia a la tabla `clientes` de `modulo_acreditacion`. No hay integridad referencial entre microservicios, por diseño, para permitir despliegue e infraestructura de datos independientes.
 
@@ -30,7 +32,8 @@ src/
 
 **Standalone:**
 ```bash
-cd modulo_facturacion
+git clone https://github.com/benjaminAndaur/hub-ms-facturacion.git
+cd hub-ms-facturacion
 pip install -r requirements.txt
 
 export DATABASE_URL=postgresql+asyncpg://admin:admin123@localhost:5432/facturacion_db
@@ -39,7 +42,7 @@ export JWT_SECRET=super-secret-key-123
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Stack completo:** desde `hub-infra`, `docker-compose up --build` (levanta `db-facturacion` automáticamente).
+**Stack completo:** clonar este repo como hermano de `hub-infra`, `hub-backends` y `hub-frontends` (mismo directorio padre), luego desde `hub-infra` ejecutar `docker-compose up --build` (levanta `db-facturacion` automáticamente).
 
 ## Cómo probar
 
