@@ -2,7 +2,7 @@
 
 Microservicio de Facturación del Hub Empresarial. Expone una API REST (Quart, async) para crear, listar, actualizar y eliminar facturas.
 
-Repos relacionados: [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) (nginx, docker-compose, base de datos), [`hub-backends`](https://github.com/benjaminAndaur/hub-backends) (resto de microservicios), [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion) (microservicio hermano con BD propia), [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends).
+Repos relacionados: [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) (nginx, docker-compose, base de datos), [`hub-backends`](https://github.com/benjaminAndaur/hub-backends) (resto de microservicios), [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion) (microservicio hermano con BD propia), [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends), [`hub-bff`](https://github.com/benjaminAndaur/hub-bff) (BFF en NestJS que agrega este microservicio + operación, protegido con Circuit Breaker).
 
 ## Persistencia de datos — Database per Service
 
