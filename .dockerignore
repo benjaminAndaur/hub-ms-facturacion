@@ -1,0 +1,13 @@
+.git
+.env
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+htmlcov
+coverage
+*.xml
+.coveragerc
+pytest.ini
+GUIA_PRUEBAS.md
+README.md
