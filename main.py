@@ -29,22 +29,24 @@ def get_async_session():
 
 
 async def ensure_database_exists():
-    """Crea la base de datos si no existe, conectando primero a 'operacion_db'."""
+    """Crea la base de datos si no existe, conectando a la BD 'postgres' del mismo servidor."""
     import re
-    # Extraer nombre de la BD objetivo y construir URL a operacion_db
     db_name = re.search(r'/(\w+)$', DATABASE_URL)
     if not db_name:
         return
     target_db = db_name.group(1)
-    base_url = DATABASE_URL[:DATABASE_URL.rfind('/')] + '/operacion_db'
+    # Conectar a 'postgres' (BD de mantenimiento que siempre existe)
+    base_url = DATABASE_URL[:DATABASE_URL.rfind('/')] + '/postgres'
     try:
         import asyncpg
         dsn = base_url.replace('postgresql+asyncpg://', 'postgresql://')
-        conn = await asyncpg.connect(dsn=dsn, timeout=10)
+        conn = await asyncpg.connect(dsn=dsn, timeout=15)
         exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname=$1", target_db)
         if not exists:
             await conn.execute(f'CREATE DATABASE "{target_db}"')
-            print(f"Base de datos '{target_db}' creada.")
+            print(f"Base de datos '{target_db}' creada exitosamente.")
+        else:
+            print(f"Base de datos '{target_db}' ya existe.")
         await conn.close()
     except Exception as e:
         print(f"Advertencia al verificar/crear BD: {e}")
