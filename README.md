@@ -64,3 +64,48 @@ curl -H "Authorization: Bearer <token>" http://localhost:8080/api/v1/facturacion
 | GET | `/api/v1/facturacion/facturas/<id>` | `facturacion:view` |
 | PUT | `/api/v1/facturacion/facturas/<id>` | `facturacion:edit` |
 | DELETE | `/api/v1/facturacion/facturas/<id>` | `facturacion:edit` |
+
+---
+
+## Despliegue en AWS — DevOps (ISY1101)
+
+### Arquitectura en producción
+
+```
+ALB → /api/v1/bff/* → hub-bff (ECS, :3000) → hub-ms-facturacion (ECS, :5000)
+                                                      ↓
+                                           RDS facturacion_db (:5432, privado)
+```
+
+- **Cluster:** `hub-empresarial-cluster` (AWS ECS Fargate)
+- **Imagen:** `720243276279.dkr.ecr.us-east-1.amazonaws.com/hub-ms-facturacion:<sha>`
+- **Task Definition:** 256 CPU units / 512 MB RAM, role = `LabRole`
+- **Base de datos:** RDS PostgreSQL `hub-empresarial-db`, base `facturacion_db` (aislada)
+
+### Variables de entorno en producción (Task Definition ECS)
+
+| Variable | Descripción |
+|---|---|
+| `DATABASE_URL` | endpoint RDS privado a `facturacion_db` |
+| `JWT_SECRET` | inyectado vía Task Definition (no en código) |
+
+### Pipeline CI/CD (GitHub Actions)
+
+Push a `main` → `.github/workflows/deploy.yml`:
+```
+checkout → AWS credentials → ECR login → docker build (multietapa) → push ECR → update task-def → deploy ECS
+```
+- Duración: **~3m 31s**
+- **3 imágenes en ECR** (3 pipeline runs): demuestra iteración real de desarrollo
+- Tags: SHA del commit (`16a3b800...`) + `latest`
+
+### Problema resuelto en producción
+
+Al primer despliegue, `facturacion_db` no existía en RDS. Se resolvió conectando al motor `postgres` (maintenance DB) del mismo RDS para crear la base antes de que el servicio arranque. El microservicio ya incluye lógica de creación automática al startup (`Base.metadata.create_all()`).
+
+### Verificar despliegue
+
+```bash
+curl http://hub-empresarial-alb-1969847223.us-east-1.elb.amazonaws.com/api/v1/facturacion/health
+# {"status": "ok", "db_status": "connected"}
+```
