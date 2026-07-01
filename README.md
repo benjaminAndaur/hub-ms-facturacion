@@ -109,3 +109,4 @@ Al primer despliegue, `facturacion_db` no existía en RDS. Se resolvió conectan
 curl http://hub-empresarial-alb-1969847223.us-east-1.elb.amazonaws.com/api/v1/facturacion/health
 # {"status": "ok", "db_status": "connected"}
 ```
+
